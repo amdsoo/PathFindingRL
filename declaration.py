@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 # simulation specification
-epoch_max = 80000
+epoch_max = 50000
 gamma = 0.95
 
 

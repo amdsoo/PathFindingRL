@@ -241,6 +241,7 @@ def compute_path (world):
 
 	# a counter to exit if the system cannot find a way to reach the goal
 	count = 0
+	exit_with_error = False
 
 
 	while current_state != cell_goal:
@@ -259,17 +260,24 @@ def compute_path (world):
 		cell_object = m.find_cell_from_rank(current_state)
 		next_cell_object = m.cell_from_position(cell_object, next_step_index)
 
-		# we store the new cell and move to the next one
-		d.steps.append(next_cell_object.rank)
-		current_state = next_cell_object.rank
+		if next_cell_object is None:
+			#this case happens when the Q table is too empty, for instance if this is an impossible choice (moving to a cell that doesnt exist)
+			exit_with_error = True
 
 		count +=1
 		if count > nb_cells*2:
+			exit_with_error = True
+
+		if exit_with_error:
 			d.steps = []
 			world.nb_random_choice = 0
 			world.state =1
 			print("No solution found")
 			return
+
+		# we store the new cell and move to the next one
+		d.steps.append(next_cell_object.rank)
+		current_state = next_cell_object.rank
 
 	print("Most efficient path:" , d.steps)
 	world.state = 2
