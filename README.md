@@ -19,7 +19,13 @@ reward_init = -30 / any tiles
  
 # prepare UC 
 the code allows to prepare csv files which can be uploaded using the Open Command   
-Check under setup folder for exemple like the one below   
+Check under setup folder for exemple like the one below
+
+line 1:  comment   
+line 2 grid size  
+line 3 start position   
+line 4 end position  
+Line 5 to EOF : gris description (0 = blank, X = Wall , C = crossable wall , P = preferred path)  
   
 #header : table UC for grid 32x32  
 32  
