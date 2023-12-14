@@ -34,7 +34,22 @@ button_list = []
 world  = c.World()
 grid   = c.Grid()
 
+# main creation of creation buttons
+ui.menu_create(button_list)
+
+# simulation and open are independant
+x = button_size
+y = screen_height +1  - button_zone_low_height
+button_simulation = ui.Button("simulation", 15 * x,y )
+button_open       = ui.Button("open", 16 * x, y)
+button_filter = ui.Button("filter",10 * button_size , 0 )
+
 # create at least one Start and one End
+col , row = 0 , 0
+x , y = col * tile_size + grid_margin_x, row * tile_size + button_zone_high_height
+d.cell_start = c.Start(x,y)
+d.all_sprites_list.add(d.cell_start)
+d.cell_start.col , d.cell_start.row = col , row
 
 col , row = 15 , 15
 x , y = col * tile_size + grid_margin_x, row * tile_size + button_zone_high_height
@@ -44,19 +59,8 @@ d.cell_end.col , d.cell_end.row = col , row
 
 
 # we clean the cell list and recompute the active cells
-m.clear_env(world)
-
-
-# main creation of creation buttons
-ui.menu_create(button_list)
-
-
-# simulation and open are independant
-x = button_size
-y = screen_height +5 - button_zone_low_height
-button_simulation = ui.Button("Simulation", 15 * x,y )
-button_open       = ui.Button("open", 16 * x, y)
-
+m.clear_env(button_filter.state)
+world.state = 0
 
 # game loop
 inwork_mode = False
@@ -81,6 +85,7 @@ while run:
 			placement_type = ""
 			button_simulation.click()
 			button_open.click()
+			button_filter.click()
 
 			# check all the buttons from button list, if something is clicked, deactivate all
 			placement_type = ui.menu_state_from_event(button_list)
@@ -107,7 +112,7 @@ while run:
 			if not inwork_mode:
 
 				# creation of object based on category selected from the active button
-				object_class = ui.menu_selection_frombutton(button_list)
+				object_class = ui.class_selection_from_button(button_list)
 
 				if object_class != "":
 					tmp_object = eval("c." + object_class)(Mouse_x, Mouse_y)
@@ -148,19 +153,22 @@ while run:
 						d.all_sprites_list.add(tmp_object)
 
 						# we clean the cell list and recompute the active cells
-						m.clear_env(world)
+						m.clear_env(button_filter.state)
+						world.state = 0
 
 					elif isinstance(tmp_object,c.Preferred):
 						d.preferred_list.append(tmp_object)
 						d.all_sprites_list.add(tmp_object)
 						# we clean everything
-						m.clear_env(world)
+						m.clear_env(button_filter.state)
+						world.state = 0
 
 					elif isinstance(tmp_object,c.Crossable):
 						d.crossable_list.append(tmp_object)
 						d.all_sprites_list.add(tmp_object)
 						# we clean everything
-						m.clear_env(world)
+						m.clear_env(button_filter.state)
+						world.state = 0
 
 					elif isinstance(tmp_object,c.Start):
 
@@ -181,7 +189,8 @@ while run:
 						# we register the new End Graphic
 						d.cell_end = tmp_object
 						# we clean everything
-						m.clear_env(world)
+						m.clear_env(button_filter.state)
+						world.state = 0
 
 					elif isinstance(tmp_object,c.Delete):
 						something_was_deleted = False
@@ -210,7 +219,9 @@ while run:
 
 						if something_was_deleted :
 							# we clean everything
-							m.clear_env(world)
+							world.state = 0
+							m.clear_env(button_filter.state)
+							world.state = 0
 
 					# we remove the sprite from the tmp group
 
@@ -239,6 +250,7 @@ while run:
 		button.draw(screen)
 	button_simulation.draw(screen)
 	button_open.draw(screen)
+	button_filter.draw(screen)
 
 	# We draw the sprite graphic group
 	d.all_sprites_list.draw(screen)
@@ -254,7 +266,6 @@ while run:
 		# we initialize the matrix of network from the perspective of reaching the cell_goal
 
 		simu.compute_matrix2 (world, screen)
-		'''h.plot(d.scores)'''
 
 		# we compute a first path, using the Start stored
 		simu.compute_path(world)
