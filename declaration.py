@@ -4,16 +4,16 @@ import random
 import numpy as np
 
 # simulation specification
-epoch_max = 50000
+epoch_max = 70000
 gamma = 0.95
 
 
 # simulation reward
-reward_goal = 250
-reward_preferred = 100
-reward_crossable = -400
+reward_goal = 100
+reward_preferred = 50
+reward_crossable = -20
 reward_nothing = 0
-reward_init = -1000
+reward_init = -30
 
 # the cell to display Q values
 cell_under_mouse = None
@@ -31,6 +31,9 @@ end_list         = []
 # start and end position on the grid, those are graphics objects, no information on grid rank
 cell_start = None
 cell_end = None
+
+#how many col and row beyond Start and End in case filter in ON
+filter_margin = 2
 
 training_ready = False
 
@@ -99,8 +102,8 @@ end_img = pygame.image.load('img/end.png')
 end_obj_img= pygame.image.load('img/end_obj.png')
 end_ns_img= pygame.image.load('img/end_ns.png')
 
-simu_off_img = pygame.image.load('img/simulationOFF.png')
-simu_on_img = pygame.image.load('img/simulationON.png')
+simulation_img = pygame.image.load('img/simulation.png')
+simulation_ns_img = pygame.image.load('img/simulation_ns.png')
 
 delete_img = pygame.image.load('img/delete.png')
 delete_obj_img = pygame.image.load('img/delete_obj.png')
@@ -116,5 +119,8 @@ crossable_ns_img = pygame.image.load('img/crossable_ns.png')
 
 open_img = pygame.image.load('img/open.png')
 open_ns_img = pygame.image.load('img/open_ns.png')
+
+filter_img = pygame.image.load('img/filter.png')
+filter_ns_img = pygame.image.load('img/filter_ns.png')
 
 

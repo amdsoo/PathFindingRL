@@ -7,6 +7,7 @@ import method as m
 import pygame
 import networkx as nx
 import numpy as np
+import time
 
 
 '''from line_profiler_pycharm import profile'''
@@ -78,6 +79,9 @@ def compute_possible_paths():
 	return nb_possible_paths
 
 def compute_matrix2 (world, screen):
+	# we measure time from here
+	start_time = time.time()
+
 	nb_cells = len(d.cell_list)
 	edge_array =[]
 
@@ -222,6 +226,10 @@ def compute_matrix2 (world, screen):
 
 	d.training_ready = True
 
+	end_time = time.time()
+	world.computation_time = round(end_time - start_time,2)
+	'''print("Compute time #", world.computation_time)'''
+
 	return
 
 def compute_path (world):
@@ -230,7 +238,16 @@ def compute_path (world):
 	nb_cells = len(d.cell_list)
 	# retrieve start and end cells from graphics
 	objectstart = m.find_cell(d.cell_start.col, d.cell_start.row)
+
+	if objectstart is None:
+		d.steps = []
+		world.nb_random_choice = 0
+		world.state = 1
+		print("No solution found")
+		return
 	cell_start = objectstart.rank
+
+
 	objectend   = m.find_cell(d.cell_end.col, d.cell_end.row)
 	cell_goal = objectend.rank
 

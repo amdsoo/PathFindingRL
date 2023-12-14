@@ -29,6 +29,7 @@ class World:
 
 		self.score = 0
 		self.cycle = 0
+		self.computation_time = 0
 		self.nb_possible_paths = 0
 
 		self.nb_random_choice  = 0
@@ -129,7 +130,10 @@ class World:
 				i +=1
 
 			text_surface = my_font.render ("Path value / "+str(round(total_value)), False, BLACK)
-			screen.blit(text_surface, (input_rect.x + text_margin + text_column*2, 0))
+			screen.blit(text_surface, (input_rect.x + text_margin + text_column*2, text_row))
+
+		text_surface = my_font.render ("Compute Time / "+str(self.computation_time) +" s", False, BLACK)
+		screen.blit(text_surface, (input_rect.x + text_margin + text_column*2,0 ))
 
 	def open(self):
 		# this is the Open of an existing csv containing a predefined UC
@@ -172,7 +176,7 @@ class World:
 
 		if grid_size != col_max+1:
 			# we abort
-			m.clear_env(self)
+			m.clear_env("depressed")
 			file.close()
 			self.state = 3
 			return
@@ -231,7 +235,7 @@ class World:
 
 		# closing
 		# we clean the cell list and recompute the active cells
-		m.clear_env(self)
+		m.clear_env("depressed")
 		file.close()
 
 
@@ -341,8 +345,6 @@ class Grid:
 					i = 0
 				i+=1
 				x+=1
-
-
 
 
 # The graphic objects manipulated by the UI, not used by the simulation

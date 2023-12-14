@@ -75,25 +75,44 @@ def find_cell_from_type (c_type):
 			objectfound = cell
 			return objectfound
 
-def clear_env (world):
+def clear_env (filter_state):
 	# we clean the cell list and recompute the active cells
-	world.state = 0
 	d.steps.clear()
-	compute_cells()
+	compute_cells(filter_state)
 	d.training_ready = False
 	d.cell_under_mouse = None
 
 	return
 
-def compute_cells():
+def compute_cells(filter_state):
 	# we loop over the grid to create all the cells which are going to participate in the simulation
+	# we must restrict the cells to the rectangle formed by Start and End if filter_state = "pressed"
+
+	if filter_state == "pressed":
+		min_row = min(d.cell_start.row,d.cell_end.row) -filter_margin
+		min_col = min(d.cell_start.col,d.cell_end.col) -filter_margin
+		if min_row < 0: min_row =0
+		if min_col < 0: min_col =0
+
+		max_row = max(d.cell_start.row,d.cell_end.row) + filter_margin
+		max_col = max(d.cell_start.col,d.cell_end.col) + filter_margin
+		if max_row > row_max : max_row =row_max
+		if max_col > col_max : max_col =col_max
+	else:
+		min_row = 0
+		min_col = 0
+		max_row = row_max
+		max_col = col_max
+
+
+
 	d.cell_list.clear()
 
 	nb_cells = 0
-	i ,j = 0, 0
-	while j <=row_max:
-		i = 0
-		while i <= col_max:
+	i ,j = min_col ,min_row
+	while j <=max_row:
+		i = min_col
+		while i <= max_col:
 			objectfound = None
 			objectfound = find_block(i, j)
 			ctype = "Free"
