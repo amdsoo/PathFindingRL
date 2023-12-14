@@ -1,31 +1,10 @@
 import declaration as d
 from declaration import *
+import method as m
 
 
-button_width  = button_size*0.8
-button_height = button_size*0.8
-
-
-class MouseHandler:
-    def __init__(self):
-        self.right_click = False
-        self.start_pos = None
-        self.end_pos = None
-
-    def handle_events(self, event):
-        if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 3:
-                self.right_click = False
-                self.end_pos = event.pos
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 3:
-                self.right_click = True
-                self.start_pos = event.pos
-
-    def reset(self):
-        self.right_click = False
-        self.start_pos = None
-        self.end_pos = None
+button_width  = button_size
+button_height = button_size
 
 
 class Button:
@@ -38,41 +17,17 @@ class Button:
         self.height = button_height
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.state = "depressed"
-        self.parent = "parent"
+        self.object_class = "XX"
 
-        # default image
 
-        if self.button_class == "End":
-            self.image = pygame.transform.scale(end_img , (self.width, self.height))
-            self.image_ns = pygame.transform.scale(end_ns_img , (self.width, self.height))
+        #  image settings via naming
+        #  "button_class_img" is the name of the icon when "pressed"
+        #  "button_class_ns_img" is the name of the icon when "depressed"
+        path = eval(str(button_class)+"_img")
+        path_ns = eval(str(button_class) + "_ns_img")
+        self.image = pygame.transform.scale(path, (self.width, self.height))
+        self.image_ns = pygame.transform.scale(path_ns, (self.width, self.height))
 
-        if self.button_class == "Start":
-            self.image = pygame.transform.scale(start_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(start_ns_img, (self.width, self.height))
-
-        if self.button_class == "Block":
-            self.image = pygame.transform.scale(block_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(block_ns_img, (self.width, self.height))
-
-        if self.button_class == "Preferred":
-            self.image = pygame.transform.scale(preferred_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(preferred_ns_img, (self.width, self.height))
-
-        if self.button_class == "Crossable":
-            self.image = pygame.transform.scale(crossable_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(crossable_ns_img, (self.width, self.height))
-
-        if self.button_class == "Delete":
-            self.image = pygame.transform.scale(delete_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(delete_ns_img, (self.width, self.height))
-
-        if self.button_class == "Simulation":
-            self.image = pygame.transform.scale(simu_on_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(simu_off_img, (self.width, self.height))
-
-        if self.button_class == "open":
-            self.image = pygame.transform.scale(open_img, (self.width, self.height))
-            self.image_ns = pygame.transform.scale(open_ns_img, (self.width, self.height))
 
 
     def draw(self, screen):
@@ -90,17 +45,30 @@ class Button:
         if self.rect.collidepoint(x, y) :
             print ("button clicked -> ", "Status before change", self.state)
             # special treatment for Simulation
-            if self.button_class == "Simulation":
+            if self.button_class == "simulation":
                 if self.state == "pressed":
                     self.state = "depressed"
                 else:
+                    # you can launch the simulation only if there is a Start
                     if d.cell_start != None:
                         self.state = "pressed"
-            elif self.button_class == "Delete":
+
+            elif self.button_class == "filter":
+                if self.state == "pressed":
+                    self.state = "depressed"
+                    m.clear_env(self.state)
+                else:
+                    # you can activate the Filter only if there is a Start
+                    # if d.cell_start != None:
+                        self.state = "pressed"
+                        m.clear_env(self.state)
+
+            elif self.button_class == "delete":
                 if self.state == "pressed":
                     self.state = "depressed"
                 else:
                     self.state = "pressed"
+
             else:
                 # if this is the creation button
                 if self.state == "pressed":  # the button was pressed, so now we must be depressed it and hide all
@@ -117,12 +85,11 @@ def menu_reset (button_list):
     for button in button_list:
         button.state = "depressed"
 
-
-def menu_selection_frombutton (button_list):
+def class_selection_from_button (button_list):
     object_class_pressed = ""
     for button in button_list:
         if button.state == "pressed":
-            object_class_pressed = button.button_class
+            object_class_pressed = button.object_class
     return object_class_pressed
 
 
@@ -136,34 +103,20 @@ def menu_state_from_event (button_list):
     return placement_type
 
 
-def menu_create (button_list):
+def menu_create(button_list):
     # create the buttons of the Interface
-    button_position_x = 10 * button_size + button_size / 10
-    button_position_y = button_size / 10
+    button_position_x = 11 * button_size
+    button_position_y = 0
 
-    button_position_x = button_position_x + button_size
-    button_start = Button("Start", button_position_x, button_position_y)
-    button_list.append(button_start)
+    button_name = ["start","end", "block", "preferred", "crossable", "delete"]
 
-    button_position_x = button_position_x + button_size
-    button_end = Button("End", button_position_x, button_position_y)
-    button_list.append(button_end)
+    for name in button_name:
+        new_button = Button(name, button_position_x, button_position_y)
 
-    button_position_x = button_position_x + button_size
-    button_block = Button("Block", button_position_x, button_position_y)
-    button_list.append(button_block)
+        # this trick should not be here, it is to indicate which class of object correspond each button
+        new_button.object_class = name.capitalize()
 
-    button_position_x = button_position_x + button_size
-    button_preferred = Button("Preferred", button_position_x, button_position_y)
-    button_list.append(button_preferred )
-
-    button_position_x = button_position_x + button_size
-    button_crossable = Button("Crossable", button_position_x, button_position_y)
-    button_list.append(button_crossable )
-
-    button_position_x = button_position_x + button_size
-    button_delete = Button("Delete", button_position_x, button_position_y)
-    button_list.append(button_delete)
-
+        button_list.append(new_button)
+        button_position_x = button_position_x + button_size
 
     return button_list
