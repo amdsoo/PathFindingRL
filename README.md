@@ -7,8 +7,8 @@ Code :
 
 # declaration.py
 simulation specification
-epoch_max = 70000
-gamma = 0.95
+epoch_max = 70000  
+gamma = 0.95  
 
 simulation reward
 reward_goal = 100 /reach the goal  
